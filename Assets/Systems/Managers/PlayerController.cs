@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -34,19 +35,24 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    void JumpStartedInput()
+    void HandleJumpInput(InputAction.CallbackContext context)
     {
-        Debug.Log("Jump Started");
-    }
+        if (context.started)
+        {
+            Debug.Log("Jump Started");
+            // Handle jump start logic here
+        }
+        else if (context.performed)
+        {
+            Debug.Log("Jump Performed");
+            // Handle jump performed logic here
+        }
+        else if (context.canceled)
+        {
+            Debug.Log("Jump Canceled");
+            // Handle jump canceled logic here
+        }
 
-    void JumpPerformedInput()
-    {
-        Debug.Log("Jump Performed");
-    }
-
-    void JumpCanceledInput()
-    {
-        Debug.Log("Jump Canceled");
     }
 
 
@@ -63,9 +69,8 @@ public class PlayerController : MonoBehaviour
         inputManager.MoveInputEvent += SetMoveInput;
         inputManager.LookInputEvent += SetLookInput;
 
-        inputManager.JumpStartedInputEvent += JumpStartedInput;
-        inputManager.JumpPerformedInputEvent += JumpPerformedInput;
-        inputManager.JumpCanceledInputEvent += JumpCanceledInput;
+        inputManager.JumpInputEvent += HandleJumpInput;
+
 
     }
 
@@ -74,9 +79,7 @@ public class PlayerController : MonoBehaviour
         inputManager.MoveInputEvent -= SetMoveInput;
         inputManager.LookInputEvent -= SetLookInput;
 
-        inputManager.JumpStartedInputEvent -= JumpStartedInput;
-        inputManager.JumpPerformedInputEvent -= JumpPerformedInput;
-        inputManager.JumpCanceledInputEvent -= JumpCanceledInput;
+
 
 
     }

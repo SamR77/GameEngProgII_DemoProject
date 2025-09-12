@@ -29,11 +29,18 @@ public class InputManager : MonoBehaviour, Inputs.IPlayerActions
     public event Action<Vector2> MoveInputEvent;
     public event Action<Vector2> LookInputEvent;
 
+    /* old version without passing context
     public event Action JumpStartedInputEvent;
     public event Action JumpPerformedInputEvent;
     public event Action JumpCanceledInputEvent;
+    */
+
+    public event Action<InputAction.CallbackContext> JumpInputEvent;
+
+
 
     #endregion
+
 
     #region Input Callbacks
 
@@ -52,10 +59,16 @@ public class InputManager : MonoBehaviour, Inputs.IPlayerActions
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        JumpInputEvent?.Invoke(context);  
+
+        /* old version without passing context
         if(context.started) {JumpStartedInputEvent?.Invoke();}
         if(context.performed) {JumpPerformedInputEvent?.Invoke(); }
         if(context.canceled) {JumpCanceledInputEvent?.Invoke(); }
+        */
     }
+
+
 
 
     #endregion
