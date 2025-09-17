@@ -29,15 +29,9 @@ public class InputManager : MonoBehaviour, Inputs.IPlayerActions
     public event Action<Vector2> MoveInputEvent;
     public event Action<Vector2> LookInputEvent;
 
-    /* old version without passing context
-    public event Action JumpStartedInputEvent;
-    public event Action JumpPerformedInputEvent;
-    public event Action JumpCanceledInputEvent;
-    */
-
     public event Action<InputAction.CallbackContext> JumpInputEvent;
-
-
+    public event Action<InputAction.CallbackContext> CrouchInputEvent;
+    public event Action<InputAction.CallbackContext> SprintInputEvent;
 
     #endregion
 
@@ -59,7 +53,7 @@ public class InputManager : MonoBehaviour, Inputs.IPlayerActions
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        JumpInputEvent?.Invoke(context);  
+        JumpInputEvent?.Invoke(context);
 
         /* old version without passing context
         if(context.started) {JumpStartedInputEvent?.Invoke();}
@@ -68,7 +62,15 @@ public class InputManager : MonoBehaviour, Inputs.IPlayerActions
         */
     }
 
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        CrouchInputEvent?.Invoke(context);
+    }
 
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        SprintInputEvent?.Invoke(context);
+    }
 
 
     #endregion
@@ -88,6 +90,5 @@ public class InputManager : MonoBehaviour, Inputs.IPlayerActions
             inputs.Player.Disable();
         }
     }
-
-
 }
+
