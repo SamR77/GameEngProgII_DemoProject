@@ -3,8 +3,21 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public enum MovementState
+    {
+        Idle,
+        Walking,
+        Sprinting,
+        Crouching,
+        Jumping, // Or integrate into velocity checks
+        Falling
+    }
+
+    public MovementState currentMovementState;
+    public float characterVelocity;
+
     // Manager References
-    private InputManager inputManager => GameManager.Instance.inputManager;
+    private InputManager inputManager => GameManager.Instance.InputManager;
     private CharacterController characterController => GetComponent<CharacterController>();
 
     [SerializeField] private Transform cameraRoot;
@@ -65,7 +78,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetCenter;
     private float targetCamY; // Target Y position for camera root during crouch transition
 
-
+    private int playerLayerMask;
 
     public Transform spawnPosition;
 
@@ -75,6 +88,11 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        playerLayerMask = ~LayerMask.GetMask("Player");
+
+        #region Initialize Default values
+        currentMovementState = MovementState.Idle;
+
         // Initialize crouch variables
         standingHeight = characterController.height;
         standingCenter = characterController.center;
@@ -83,27 +101,82 @@ public class PlayerController : MonoBehaviour
         targetHeight = standingHeight;
         targetCenter = standingCenter;
         targetCamY = cameraRoot.localPosition.y;
+
+        // set default state of bools
+        crouchInput = false;
+        sprintInput = false;
+
+        #endregion
     }
 
-    private void Update()
-    {
-        HandlePlayerMovement();
-    }
 
-    private void LateUpdate()
-    {
-        HandlePlayerLook();
-    }
 
     public void HandlePlayerMovement()
     {
+        characterVelocity = characterController.velocity.magnitude;
+
         if (moveEnabled == false) return; // Check if movement is enabled
 
         // DetermineMovementState
+        DetermineMovemementState();
 
+        // perform Ground Check
         GroundedCheck();
+
+        // Handle Crouch Transition
         HandleCrouchTransition();
 
+        // Apply Movement
+        ApplyMovement();        
+    }
+
+    private void DetermineMovemementState()
+    {
+        // determine current movement state based on inputs and conditions
+
+        // if the player is not grounded, they are either jumping or falling
+        if (isGrounded == false)
+        {
+            // check if the player is moving upwards (jumping) or downwards (falling)
+            if (velocity.y > 0.1f)
+            {
+                currentMovementState = MovementState.Jumping;
+            }
+            else if (velocity.y < 0)
+            {
+                currentMovementState = MovementState.Falling;
+            }
+        }
+
+        else if (isGrounded == true)
+        {
+            if (crouchInput == true || isObstructed == true)
+            {
+                currentMovementState = MovementState.Crouching;
+            }
+
+            // sprint check
+            else if (sprintInput == true && currentMovementState != MovementState.Crouching)
+            {
+                currentMovementState = MovementState.Sprinting;
+            }
+
+            // walk check
+            else if (moveInput.magnitude > 0.1f && sprintInput == false && crouchInput == false)
+            {
+                currentMovementState = MovementState.Walking;
+            }
+
+            // Idle Check
+            else if (moveInput.magnitude <= 0.1f)
+            {
+                currentMovementState = MovementState.Idle;
+            }
+        }
+    }
+
+    private void ApplyMovement()
+    {
         // Step 1: Get input direction
         Vector3 moveInputDirection = new Vector3(moveInput.x, 0, moveInput.y);
         Vector3 worldMoveDirection = transform.TransformDirection(moveInputDirection);
@@ -111,15 +184,12 @@ public class PlayerController : MonoBehaviour
         // Step 2: Determine movement speed
         float targetMoveSpeed;
 
-        if (sprintInput == true)
+        switch (currentMovementState)
         {
-            targetMoveSpeed = sprintMoveSpeed;
+            case MovementState.Crouching: { targetMoveSpeed = crouchMoveSpeed; break; }
+            case MovementState.Sprinting: { targetMoveSpeed = sprintMoveSpeed; break; }
+            default: { targetMoveSpeed = walkMoveSpeed; break; }
         }
-        else
-        {
-            targetMoveSpeed = walkMoveSpeed;
-        }
-
 
         // Step 3: Smoothly interpolate current speed towards target speed
         float lerpSpeed = 1f - Mathf.Pow(0.01f, Time.deltaTime / speedTransitionDuration);
@@ -238,7 +308,7 @@ public class PlayerController : MonoBehaviour
             // TODO: Implement a proper ceiling check here to determine if standing up is possible.
             // float maxAllowedHeight = GetMaxAllowedHeight();
 
-            float maxAllowedHeight = 3.0f;
+            float maxAllowedHeight = GetMaxAllowedHeight();
 
             if (maxAllowedHeight >= standingHeight - 0.05f)
             {
@@ -278,6 +348,35 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = characterController.isGrounded;
     }
+
+    private float GetMaxAllowedHeight()
+    {
+        // Cast a ray upwards from the character's position to check for obstructions.
+
+        RaycastHit hit;
+        float maxCheckDistance = standingHeight + 0.15f;
+
+        // fire raycast
+        if (Physics.Raycast(transform.position, Vector3.up, out hit, maxCheckDistance, playerLayerMask))
+        {
+            // We hit something, so calculate the maximum height the playe can stand
+
+            // Subtract a small buffer to prevent clipping
+            float maxHeight = hit.distance - 0.1f;
+
+            // Ensure we don't go below crouching height
+            maxHeight = Mathf.Max(maxHeight, crouchingHeight);
+
+            Debug.Log($"Overhead obstruction detected. Max allowed height: {maxHeight:F2}");
+            return maxHeight;
+        }
+
+        // No obstruction found, can stand at full height
+        return standingHeight;
+    }
+
+
+
     public void MovePlayerToSpawnPosition(Transform spawnPosition)
     {
         Debug.Log("Moving player to Spawn Position");
