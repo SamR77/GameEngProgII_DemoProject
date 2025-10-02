@@ -1,0 +1,38 @@
+Lesson 01
+
+- Player Controller
+- InputManager
+- GameManager
+
+
+Lesson 02
+
+- Added Crouch to Player Controller
+- Added Jump to Player Controller
+- Enum Based PlayerState
+
+Lesson 03
+
+- Started GameStateManager
+- Switch from Gameplay to MainMenu State via keypress
+
+Lesson 04
+
+- Added UI manager
+- Gameplay, MainMenu & Pause UI
+- Setup Buttons
+- Setup Pause State
+- Mini challenge (setup GameOver State)
+
+Lesson 05
+
+- LevelManager - ablity to switch between levels
+- Track SpawnPoint on Level switch to move player to correct Spawn point
+- Waiting on Scene Change
+
+- Update to UIToolkit
+- Interaction System
+- CameraManager (Cinemachine)
+- Setting Screen UI (Scriptable Objects)
+- Adjust resolution based on Detected device
+- BootLoader (After LevelManager)

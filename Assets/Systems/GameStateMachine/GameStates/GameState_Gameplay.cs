@@ -5,8 +5,8 @@ public class GameState_Gameplay : IState
 {
     GameManager gameManager => GameManager.Instance;
     GameStateManager gameStateManager => GameManager.Instance.GameStateManager;
-
     PlayerController playerController => GameManager.Instance.PlayerController;
+    UIManager uIManager => GameManager.Instance.UIManager;
 
 
 
@@ -28,24 +28,35 @@ public class GameState_Gameplay : IState
     public void EnterState()
     {
         Debug.Log("Entered Gameplay State");
+
+        Time.timeScale = 1f; // Resume  
+        
+        Cursor.visible = false;
+
+        uIManager.ShowGameplayUI();
     }
 
     public void FixedUpdateState()
     {
-        
+
     }
 
     public void UpdateState()
     {
         playerController.HandlePlayerMovement();
 
-
         Debug.Log("Running Gameplay Update State");
 
-        if (Keyboard.current[Key.P].wasPressedThisFrame)
-        { 
-            gameStateManager.SwitchToState(GameState_MainMenu.Instance);
+
+        if (Keyboard.current[Key.Escape].wasPressedThisFrame)
+        {
+            gameStateManager.Pause();
         }
+
+
+
+
+
 
     }
 

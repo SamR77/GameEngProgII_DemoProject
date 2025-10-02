@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class GameState_MainMenu : IState
+public class GameState_Paused : IState
 {
     GameManager gameManager => GameManager.Instance;
     GameStateManager gameStateManager => GameManager.Instance.GameStateManager;
@@ -11,25 +11,24 @@ public class GameState_MainMenu : IState
     #region Singleton Instance
     // A single, readonly instance of the atate class is created.
     // The 'readonly' keyword ensures this instance cannot be modified after initialization.
-    private static readonly GameState_MainMenu instance = new GameState_MainMenu();
+    private static readonly GameState_Paused instance = new GameState_Paused();
 
     // Provides global access to the singleton instance of this state.
     // Uses an expression-bodied property to return the static _instance variable.
-    public static GameState_MainMenu Instance = instance;
+    public static GameState_Paused Instance = instance;
     #endregion
 
 
 
-    public void EnterState()
+    public void EnterState()        
     {
-        Debug.Log("Entered Main Menu State");
+        Debug.Log("Entered Paused State");
 
         Time.timeScale = 0f; // Pause the game
 
         Cursor.visible = true;
 
-
-        uIManager.ShowMainMenu();
+        uIManager.ShowPauseMenu();
     }
 
     public void FixedUpdateState()
@@ -39,9 +38,12 @@ public class GameState_MainMenu : IState
 
     public void UpdateState()
     {
+        Debug.Log("Running MainMenu Update State");
 
-
-
+        if (Keyboard.current[Key.Escape].wasPressedThisFrame)
+        {
+            gameStateManager.Resume();  
+        }
     }
 
     public void LateUpdateState()
