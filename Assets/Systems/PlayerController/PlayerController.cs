@@ -1,8 +1,17 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    // Manager References
+    private InputManager inputManager => GameManager.Instance.InputManager;
+    private CharacterController characterController => GetComponent<CharacterController>();
+
+    [SerializeField] private Transform cameraRoot;
+    public Transform CameraRoot => cameraRoot;
+
+
     public enum MovementState
     {
         Idle,
@@ -16,20 +25,23 @@ public class PlayerController : MonoBehaviour
     public MovementState currentMovementState;
     public float characterVelocity;
 
-    // Manager References
-    private InputManager inputManager => GameManager.Instance.InputManager;
-    private CharacterController characterController => GetComponent<CharacterController>();
-
-    [SerializeField] private Transform cameraRoot;
-    public Transform CameraRoot => cameraRoot;
-
     [Header("Enable/Disable Controls & Features")]
     public bool moveEnabled = true;
     public bool lookEnabled = true;
 
     [SerializeField] private bool jumpEnabled = true;
+
     [SerializeField] private bool sprintEnabled = true;
+    [SerializeField] private bool holdToSprint = true;  // true = HOLD to sprint, false = TOGGLE to sprint
+
     [SerializeField] private bool crouchEnabled = true;
+    [SerializeField] private bool holdToCrouch = true;  // true = HOLD to crouch, false = TOGGLE to crouch
+
+
+
+
+
+
 
     [Header("Move Settings")]
     public float moveSpeed = 5;
@@ -284,9 +296,10 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+
     private void HandleCrouchTransition()
     {
-        bool shouldCrouch = crouchInput == true;
+        bool shouldCrouch = crouchInput == true && currentMovementState != MovementState.Jumping && currentMovementState != MovementState.Falling;
 
         // if airborne and was crouching, maintain crouch state (prevents standing up from crouch while walking off a ledge)
         bool wasAlreadyCrouching = characterController.height < (standingHeight - 0.05f);
@@ -305,9 +318,6 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // TODO: Implement a proper ceiling check here to determine if standing up is possible.
-            // float maxAllowedHeight = GetMaxAllowedHeight();
-
             float maxAllowedHeight = GetMaxAllowedHeight();
 
             if (maxAllowedHeight >= standingHeight - 0.05f)
@@ -340,8 +350,8 @@ public class PlayerController : MonoBehaviour
 
         Vector3 currentCamPos = cameraRoot.localPosition;
         cameraRoot.localPosition = new Vector3(currentCamPos.x, Mathf.Lerp(currentCamPos.y, targetCamY, lerpSpeed), currentCamPos.z);
-    }
 
+    }
 
     #region Helper Methods
     private void GroundedCheck()
@@ -430,9 +440,25 @@ public class PlayerController : MonoBehaviour
 
         if (context.started)
         {
-            crouchInput = !crouchInput;
+            if (holdToCrouch == true)
+            {
+                crouchInput = true;
+            }
 
-            Debug.Log("Crouch Input Started");
+            // If holdToCrouch is false, Crouch will revert to toggle mode
+            else if (holdToCrouch == false)
+            {
+                crouchInput = !crouchInput;
+            }
+        }
+
+        else if (context.canceled)
+        {
+            // Only update crouchInput if holdToCrouch is enabled, otherwise in toggle mode we'll ignore the input canceled / button release
+            if (holdToCrouch == true)
+            {
+                crouchInput = false;
+            }
         }
     }
 
@@ -443,11 +469,25 @@ public class PlayerController : MonoBehaviour
 
         if (context.started)
         {
-            sprintInput = true;
+            if (holdToSprint == true)
+            {
+                sprintInput = true;
+            }
+
+            // If holdToSprint is false, Sprint will revert to toggle mode
+            else if (holdToSprint == false)
+            {
+                sprintInput = !sprintInput;
+            }
         }
+
         else if (context.canceled)
         {
-            sprintInput = false;
+            // Only update sprintInput if holdToSprint is enabled, otherwise in toggle mode we'll ignore the input canceled / button release
+            if (holdToSprint == true)
+            {
+                sprintInput = false;
+            }
         }
 
     }
@@ -458,6 +498,30 @@ public class PlayerController : MonoBehaviour
     #endregion
 
 
+    public void MovePlayerToSpawnpoint(string v)
+    {
+        // find an object in the scene with the script "PlayerSpawnpoint"
+
+        Transform targetSpawnpoint = FindFirstObjectByType<PlayerSpawnpoint>().transform;
+
+        // this is very basic an only works if there is one spawnpoint in the scene, but works for now.
+
+        // for a scene with multiple spawnpoints, we will need to find all the spawnpoints in the scene and store them in an array and then call the correct one based on ID.
+
+
+
+
+        // Perform the actual move
+        characterController.enabled = false;
+        transform.position = targetSpawnpoint.position;
+        transform.rotation = targetSpawnpoint.rotation;
+        characterController.enabled = true;
+
+        velocity = Vector3.zero;
+        cameraRoot.localEulerAngles = Vector3.zero;
+
+        Debug.Log($"Player repositioned to spawn point at {targetSpawnpoint.position}");
+    }
 
 
 
@@ -483,7 +547,5 @@ public class PlayerController : MonoBehaviour
 
 
     }
-
-
 
 }

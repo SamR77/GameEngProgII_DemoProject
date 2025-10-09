@@ -22,7 +22,7 @@ public class GameStateManager : MonoBehaviour
         currentState.EnterState();
     }
 
-    private void SwitchToState(IState newState)
+    public void SwitchToState(IState newState)
     {
         lastState = currentState; // Store the current state as the last state
         lastActiveState = lastState.ToString(); // Update debug info in inspector

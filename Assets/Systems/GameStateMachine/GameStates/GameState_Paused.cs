@@ -29,6 +29,10 @@ public class GameState_Paused : IState
         Cursor.visible = true;
 
         uIManager.ShowPauseMenu();
+
+
+
+
     }
 
     public void FixedUpdateState()

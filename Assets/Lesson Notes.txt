@@ -36,3 +36,5 @@ Lesson 05
 - Setting Screen UI (Scriptable Objects)
 - Adjust resolution based on Detected device
 - BootLoader (After LevelManager)
+
+- Attract Mode

@@ -34,6 +34,9 @@ public class GameState_Gameplay : IState
         Cursor.visible = false;
 
         uIManager.ShowGameplayUI();
+
+
+
     }
 
     public void FixedUpdateState()

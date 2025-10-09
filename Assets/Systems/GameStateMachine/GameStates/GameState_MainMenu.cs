@@ -30,6 +30,11 @@ public class GameState_MainMenu : IState
 
 
         uIManager.ShowMainMenu();
+
+
+
+ 
+
     }
 
     public void FixedUpdateState()
