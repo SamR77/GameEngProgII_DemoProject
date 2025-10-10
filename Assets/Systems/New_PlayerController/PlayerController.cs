@@ -76,15 +76,15 @@ public class PlayerController : MonoBehaviour
     // private float groundCheckRadius = 0.1f; // Radius for ground check sphere
 
     [Header("Crouch Settings")]
+    [SerializeField] private float crouchTransitionDuration = 0.2f; // Time in seconds for crouch/stand transition (approximate completion)
+    [SerializeField] private float crouchingHeight = 1.0f;
+    [SerializeField] private Vector3 crouchingCenter = new Vector3(0, 0.5f, 0);
+    [SerializeField] private float crouchingCamY = 0.75f;
     private float standingHeight;
     private Vector3 standingCenter;
     private float standingCamY;
     private bool isObstructed = false;
 
-    [SerializeField] private float crouchTransitionDuration = 0.2f; // Time in seconds for crouch/stand transition (approximate completion)
-    [SerializeField] private float crouchingHeight = 1.0f;
-    [SerializeField] private Vector3 crouchingCenter = new Vector3(0, 0.5f, 0);
-    [SerializeField] private float crouchingCamY = 0.75f;
 
     private float targetHeight;
     private Vector3 targetCenter;
@@ -252,8 +252,7 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyJumpAndGravity()
     {
-        if (jumpEnabled == false) return; // If jump is not enabled, do nothing and just return;
-
+       
         // Process jump if...
         //  + Jump Requested (via input)
         //  + Player is currently grounded

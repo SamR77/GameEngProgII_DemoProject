@@ -9,7 +9,7 @@ public class PlayerSpawnpoint : MonoBehaviour
 
 
 
-    public string spawnpointId; // Unique ID for specific spawnpoints
+   
 
     [Header("Body Gizmo Settings")]
     private Vector3 bodyLocalOffset = new Vector3(0, 1.0f, 0); // Offset for the main body (sphere and cube)
@@ -24,6 +24,8 @@ public class PlayerSpawnpoint : MonoBehaviour
 
 
 
+
+    #region Gizmo Visualization
 
     void OnDrawGizmos()
     {
@@ -109,4 +111,6 @@ public class PlayerSpawnpoint : MonoBehaviour
         // Restore the original Gizmos.matrix for the arrow group before drawing the next part
         Gizmos.matrix = originalMatrix;
     }
+
+    #endregion
 }
