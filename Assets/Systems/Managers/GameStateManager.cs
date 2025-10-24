@@ -91,7 +91,6 @@ public class GameStateManager : MonoBehaviour
     public void Play()
     {
         SwitchToState(gameState_Gameplay);
-
     }
 
     public void MainMenu()

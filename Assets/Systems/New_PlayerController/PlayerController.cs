@@ -73,7 +73,11 @@ public class PlayerController : MonoBehaviour
     private float jumpCooldownAmount = 0.2f; // Time before allowing another jump    
     private float jumpCooldownTimer = 0f;
     private bool jumpRequested = false;
-    // private float groundCheckRadius = 0.1f; // Radius for ground check sphere
+    private float groundCheckRadius;     // Radius for ground check sphere
+    private bool groundCheckLayered = false;    // Whether to use LayerMask for ground check
+
+    private Vector3 checkSpherePosition; // Y offset for ground check sphere
+
 
     [Header("Crouch Settings")]
     [SerializeField] private float crouchTransitionDuration = 0.2f; // Time in seconds for crouch/stand transition (approximate completion)
@@ -100,7 +104,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        playerLayerMask = ~LayerMask.GetMask("Player");
+        
 
         #region Initialize Default values
         currentMovementState = MovementState.Idle;
@@ -117,6 +121,10 @@ public class PlayerController : MonoBehaviour
         // set default state of bools
         crouchInput = false;
         sprintInput = false;
+
+
+        groundCheckRadius = characterController.radius + 0.1f;
+        playerLayerMask = ~LayerMask.GetMask("Player");
 
         #endregion
     }
@@ -353,9 +361,67 @@ public class PlayerController : MonoBehaviour
     }
 
     #region Helper Methods
+    private void OnDrawGizmos()
+    {
+       Gizmos.DrawWireSphere(checkSpherePosition, groundCheckRadius);
+    }
+
     private void GroundedCheck()
     {
-        isGrounded = characterController.isGrounded;
+        //isGrounded = characterController.isGrounded;
+
+
+        bool previouslyGrounded = isGrounded; // Store previous grounded state
+
+        // Ground check logic without requiring a LayerMask
+        if (groundCheckLayered == false)
+        {
+            // Start the ray slightly above the player's feet
+            Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
+            //float groundCheckDistance = (characterController.height / 2f) + 0.2f;
+            float groundCheckDistance = 0.3f;
+
+
+            // Perform raycast
+            //isGrounded = Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, ~0, QueryTriggerInteraction.Ignore);
+            //Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, Color.green, 0f, true);
+
+            // int playerLayerMask = ~(1 << LayerMask.NameToLayer("Player"));
+
+            checkSpherePosition = transform.position + new Vector3 (0,0.25f,0);
+
+
+
+            isGrounded = Physics.CheckSphere(checkSpherePosition, groundCheckRadius, playerLayerMask, QueryTriggerInteraction.Ignore);
+
+
+
+        }
+
+
+        // Ground check logic that uses a LayerMask
+        if (groundCheckLayered == true)
+        {
+            // Perform ground check
+            isGrounded = Physics.CheckSphere(transform.position, groundCheckRadius, LayerMask.GetMask("Ground"), QueryTriggerInteraction.Ignore);
+        }
+        
+
+        // Detect if the player just left the ground
+        if (isGrounded == false && previouslyGrounded == true)
+        {
+            Debug.Log("Player just left ground");
+        }
+
+        // Detect if the player just landed
+        if (isGrounded == true && previouslyGrounded == false)
+        {
+            Debug.Log($"Player just landed at Y position: {transform.position.y}");
+        }
+
+        
+
+
     }
 
     private float GetMaxAllowedHeight()
