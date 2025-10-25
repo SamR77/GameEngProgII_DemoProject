@@ -121,7 +121,7 @@ public class PlayerController : MonoBehaviour
         sprintInput = false;
 
 
-        groundCheckRadius = characterController.radius + 0.01f;
+        groundCheckRadius = characterController.radius + 0.05f;
         playerLayerMask = ~LayerMask.GetMask("Player");
 
         #endregion
@@ -258,15 +258,14 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyJumpAndGravity()
     {
-       
+
         // Process jump if...
         //  + Jump Requested (via input)
         //  + Player is currently grounded
         //  + Player is not crouching
 
         if (jumpRequested == true)
-        {
-
+        {            
             Debug.Log("Applying Jump");
             // Calculate the initial upward velocity needed to reach the desired jumpHeight.
             velocity.y = Mathf.Sqrt(2f * jumpHeight * gravity);
@@ -287,7 +286,7 @@ public class PlayerController : MonoBehaviour
             // without allowing gravity to build up indefinitely, preventing "bouncing" or
             // incorrect ground detection issues.
 
-            velocity.y = -5f;
+            velocity.y = -2f;
         }
         else  // If not grounded (in the air):
         {
@@ -460,8 +459,9 @@ public class PlayerController : MonoBehaviour
 
 
     void HandleJumpInput(InputAction.CallbackContext context)
-    {
-        if (jumpEnabled == false) return; // if Jump is not enabled, do nothing and just return;
+
+    {// if Jump is not enabled, or the player is crouchned do nothing and just return;
+        if (jumpEnabled == false || crouchInput == true) return; 
 
         // Accept both started and performed so jump is registered across devices/bindings
         if (context.started || context.performed)
