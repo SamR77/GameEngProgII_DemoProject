@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
         Walking,
         Sprinting,
         Crouching,
-        Jumping, // Or integrate into velocity checks
+        Jumping, 
         Falling
     }
 
@@ -104,8 +104,6 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        
-
         #region Initialize Default values
         currentMovementState = MovementState.Idle;
 
@@ -123,7 +121,7 @@ public class PlayerController : MonoBehaviour
         sprintInput = false;
 
 
-        groundCheckRadius = characterController.radius + 0.1f;
+        groundCheckRadius = characterController.radius + 0.01f;
         playerLayerMask = ~LayerMask.GetMask("Player");
 
         #endregion
@@ -268,6 +266,8 @@ public class PlayerController : MonoBehaviour
 
         if (jumpRequested == true)
         {
+
+            Debug.Log("Applying Jump");
             // Calculate the initial upward velocity needed to reach the desired jumpHeight.
             velocity.y = Mathf.Sqrt(2f * jumpHeight * gravity);
 
@@ -287,7 +287,7 @@ public class PlayerController : MonoBehaviour
             // without allowing gravity to build up indefinitely, preventing "bouncing" or
             // incorrect ground detection issues.
 
-            velocity.y = -1f;
+            velocity.y = -5f;
         }
         else  // If not grounded (in the air):
         {
@@ -368,59 +368,39 @@ public class PlayerController : MonoBehaviour
 
     private void GroundedCheck()
     {
-        //isGrounded = characterController.isGrounded;
+        // Store previous grounded state
+        bool previouslyGrounded = isGrounded;
 
+        // Compute a stable bottom-sphere origin based on the CharacterController geometry:
+        // bottom = transform.position + characterController.center - Vector3.up * (height*0.5f - radius)
+        Vector3 bottomCenter = transform.position + characterController.center - Vector3.up * (characterController.height * 0.5f - characterController.radius);
+        checkSpherePosition = bottomCenter;
 
-        bool previouslyGrounded = isGrounded; // Store previous grounded state
+        bool rawGrounded;
 
-        // Ground check logic without requiring a LayerMask
+        // Use the computed bottomCenter for the check sphere
         if (groundCheckLayered == false)
         {
-            // Start the ray slightly above the player's feet
-            Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
-            //float groundCheckDistance = (characterController.height / 2f) + 0.2f;
-            float groundCheckDistance = 0.3f;
-
-
-            // Perform raycast
-            //isGrounded = Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, ~0, QueryTriggerInteraction.Ignore);
-            //Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, Color.green, 0f, true);
-
-            // int playerLayerMask = ~(1 << LayerMask.NameToLayer("Player"));
-
-            checkSpherePosition = transform.position + new Vector3 (0,0.25f,0);
-
-
-
-            isGrounded = Physics.CheckSphere(checkSpherePosition, groundCheckRadius, playerLayerMask, QueryTriggerInteraction.Ignore);
-
-
-
+            rawGrounded = Physics.CheckSphere(checkSpherePosition, groundCheckRadius, playerLayerMask, QueryTriggerInteraction.Ignore);
         }
-
-
-        // Ground check logic that uses a LayerMask
-        if (groundCheckLayered == true)
+        else
         {
-            // Perform ground check
-            isGrounded = Physics.CheckSphere(transform.position, groundCheckRadius, LayerMask.GetMask("Ground"), QueryTriggerInteraction.Ignore);
+            rawGrounded = Physics.CheckSphere(checkSpherePosition, groundCheckRadius, LayerMask.GetMask("Ground"), QueryTriggerInteraction.Ignore);
         }
-        
 
-        // Detect if the player just left the ground
+        // Update reported grounded state
+        isGrounded = rawGrounded;
+
+        // Detect transitions
         if (isGrounded == false && previouslyGrounded == true)
         {
             Debug.Log("Player just left ground");
         }
 
-        // Detect if the player just landed
         if (isGrounded == true && previouslyGrounded == false)
         {
             Debug.Log($"Player just landed at Y position: {transform.position.y}");
-        }
-
-        
-
+        }   
 
     }
 
@@ -483,9 +463,10 @@ public class PlayerController : MonoBehaviour
     {
         if (jumpEnabled == false) return; // if Jump is not enabled, do nothing and just return;
 
-        if (context.started)
+        // Accept both started and performed so jump is registered across devices/bindings
+        if (context.started || context.performed)
         {
-            Debug.Log("Jump Input Started");
+            Debug.Log("Jump Input Triggered");
 
             if (isGrounded && jumpCooldownTimer <= 0f)
             {
@@ -607,8 +588,8 @@ public class PlayerController : MonoBehaviour
         inputManager.LookInputEvent -= SetLookInput;
 
         inputManager.JumpInputEvent -= HandleJumpInput;
-        inputManager.CrouchInputEvent += HandleCrouchInput;
-        inputManager.SprintInputEvent += HandleSprintInput;
+        inputManager.CrouchInputEvent -= HandleCrouchInput;
+        inputManager.SprintInputEvent -= HandleSprintInput;
 
 
     }
