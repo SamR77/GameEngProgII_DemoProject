@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "Inputs",
     "maps": [
         {
@@ -45,6 +46,15 @@
                     "name": "Sprint",
                     "type": "Button",
                     "id": "c10dbd7e-88fe-490d-9bbc-ab3eed1e05fb",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "d5f7fbcd-1597-4c6d-95d8-973b81442e78",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -203,6 +213,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b06defe-9d3d-406b-989b-85007378aaec",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1b2dcf6c-79d3-41fc-a5e9-2e49bc1aab2d",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

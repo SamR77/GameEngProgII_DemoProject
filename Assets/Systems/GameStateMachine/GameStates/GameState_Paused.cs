@@ -22,7 +22,7 @@ public class GameState_Paused : IState
 
     public void EnterState()        
     {
-        Debug.Log("Entered Paused State");
+        //Debug.Log("Entered Paused State");
 
         Time.timeScale = 0f; // Pause the game
 
@@ -42,7 +42,7 @@ public class GameState_Paused : IState
 
     public void UpdateState()
     {
-        Debug.Log("Running MainMenu Update State");
+        //Debug.Log("Running MainMenu Update State");
 
         if (Keyboard.current[Key.Escape].wasPressedThisFrame)
         {
@@ -57,7 +57,7 @@ public class GameState_Paused : IState
 
     public void ExitState()
     {
-        Debug.Log("Exiting Main Menu State");
+        //Debug.Log("Exiting Main Menu State");
     }
 
 }

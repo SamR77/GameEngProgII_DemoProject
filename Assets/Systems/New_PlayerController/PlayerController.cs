@@ -29,6 +29,9 @@ public class PlayerController : MonoBehaviour
     public bool moveEnabled = true;
     public bool lookEnabled = true;
 
+    public bool debugLogsEnabled = false;
+
+
     [SerializeField] private bool jumpEnabled = true;
 
     [SerializeField] private bool sprintEnabled = true;
@@ -136,7 +139,7 @@ public class PlayerController : MonoBehaviour
         if (moveEnabled == false) return; // Check if movement is enabled
 
         // DetermineMovementState
-        DetermineMovemementState();
+        DetermineMovementState();
 
         // perform Ground Check
         GroundedCheck();
@@ -148,7 +151,7 @@ public class PlayerController : MonoBehaviour
         ApplyMovement();        
     }
 
-    private void DetermineMovemementState()
+    private void DetermineMovementState()
     {
         // determine current movement state based on inputs and conditions
 
@@ -266,7 +269,7 @@ public class PlayerController : MonoBehaviour
 
         if (jumpRequested == true)
         {            
-            Debug.Log("Applying Jump");
+            if(debugLogsEnabled) Debug.Log("Applying Jump");
             // Calculate the initial upward velocity needed to reach the desired jumpHeight.
             velocity.y = Mathf.Sqrt(2f * jumpHeight * gravity);
 
@@ -433,7 +436,7 @@ public class PlayerController : MonoBehaviour
 
     public void MovePlayerToSpawnPosition(Transform spawnPosition)
     {
-        Debug.Log("Moving player to Spawn Position");
+        if (debugLogsEnabled) Debug.Log("Moving player to Spawn Position");
 
         characterController.enabled = false;
         transform.position = spawnPosition.position;
@@ -466,7 +469,7 @@ public class PlayerController : MonoBehaviour
         // Accept both started and performed so jump is registered across devices/bindings
         if (context.started || context.performed)
         {
-            Debug.Log("Jump Input Triggered");
+            if (debugLogsEnabled) Debug.Log("Jump Input Triggered");
 
             if (isGrounded && jumpCooldownTimer <= 0f)
             {
@@ -566,7 +569,7 @@ public class PlayerController : MonoBehaviour
         velocity = Vector3.zero;
         cameraRoot.localEulerAngles = Vector3.zero;
 
-        Debug.Log($"Player repositioned to spawn point at {targetSpawnpoint.position}");
+        if (debugLogsEnabled) Debug.Log($"Player repositioned to spawn point at {targetSpawnpoint.position}");
     }
 
 
