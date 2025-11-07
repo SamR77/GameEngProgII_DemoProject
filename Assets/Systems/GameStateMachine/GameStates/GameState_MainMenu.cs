@@ -22,7 +22,7 @@ public class GameState_MainMenu : IState
 
     public void EnterState()
     {
-        Debug.Log("Entered Main Menu State");
+        //Debug.Log("Entered Main Menu State");
 
         Time.timeScale = 0f; // Pause the game
 
@@ -56,7 +56,7 @@ public class GameState_MainMenu : IState
 
     public void ExitState()
     {
-        Debug.Log("Exiting Main Menu State");
+        //Debug.Log("Exiting Main Menu State");
     }
 
 }

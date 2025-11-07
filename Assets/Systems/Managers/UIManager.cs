@@ -35,7 +35,7 @@ public class UIManager : MonoBehaviour
     
     public void ShowMainMenu()
     {
-        Debug.Log("UIManager: ShowMainMenu called.");
+        // Debug.Log("UIManager: ShowMainMenu called.");
 
         HideAllUIMenus();
 

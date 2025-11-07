@@ -27,7 +27,7 @@ public class GameState_Gameplay : IState
 
     public void EnterState()
     {
-        Debug.Log("Entered Gameplay State");
+        // Debug.Log("Entered Gameplay State");
 
         Time.timeScale = 1f; // Resume  
         
@@ -48,7 +48,7 @@ public class GameState_Gameplay : IState
     {
         playerController.HandlePlayerMovement();
 
-        Debug.Log("Running Gameplay Update State");
+        // Debug.Log("Running Gameplay Update State");
 
 
         if (Keyboard.current[Key.Escape].wasPressedThisFrame)
@@ -70,7 +70,7 @@ public class GameState_Gameplay : IState
 
     public void ExitState()
     {
-        Debug.Log("Exiting gameplay State");
+        //Debug.Log("Exiting gameplay State");
     }
 
 }
