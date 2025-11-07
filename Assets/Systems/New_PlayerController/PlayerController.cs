@@ -430,7 +430,7 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
+    /*
     public void MovePlayerToSpawnPosition(Transform spawnPosition)
     {
         Debug.Log("Moving player to Spawn Position");
@@ -440,6 +440,7 @@ public class PlayerController : MonoBehaviour
         transform.rotation = spawnPosition.rotation;
         characterController.enabled = true;
     }
+    */
 
     #endregion
 
@@ -553,8 +554,6 @@ public class PlayerController : MonoBehaviour
         // this is very basic an only works if there is one spawnpoint in the scene, but works for now.
 
         // for a scene with multiple spawnpoints, we will need to find all the spawnpoints in the scene and store them in an array and then call the correct one based on ID.
-
-
 
 
         // Perform the actual move

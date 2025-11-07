@@ -1,16 +1,16 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class GameplayUIController : MonoBehaviour
+public class LoadingUIController : MonoBehaviour
 {
     GameManager gameManager;
     UIManager uIManager;
     LevelManager levelManager;
-    InputManager inputManager;
+    InputManager inputManager; 
     GameStateManager gameStateManager;
 
-    UIDocument gameplayUIDoc;
-
+    UIDocument loadingUIDoc;
+    ProgressBar progressBar;
 
     private void Awake()
     {
@@ -33,18 +33,30 @@ public class GameplayUIController : MonoBehaviour
         #endregion
     }
 
-    // Start() is the reccomended init method for setting UItoolkit references
+    // Start() call is reccomended for setting UItoolkit references
     private void Start()
     {
         #region Set UI References
 
         // Set UI Document Reference ( "??=" if not already set)
-        gameplayUIDoc ??= GetComponent<UIDocument>();
-        if (gameplayUIDoc == null) Debug.LogError("No UIDocument component found on this gameobject!");
+        loadingUIDoc ??= GetComponent<UIDocument>();
+        if (loadingUIDoc == null) Debug.LogError("No UIDocument component found on this gameobject!");
+
+        // Set ProgressBar ( "??=" if not already set)
+        progressBar ??= loadingUIDoc.rootVisualElement.Q<ProgressBar>("ProgressBar");
+        if (progressBar == null) Debug.LogError("ProgressBar not found in LoadingUI Doc");
 
         #endregion
+
     }
 
+    public void UpdateProgressBar(float progress)
+    {
+        // progress bar is a value between 0 and 1
+        progressBar.value = progress;
 
+        // Shows 0-100% (just the integer part)
+        progressBar.title = $"{(int)(progress * 100)}%";
+    }
 
 }

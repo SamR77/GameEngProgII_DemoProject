@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,9 +14,8 @@ public class LevelManager : MonoBehaviour
 
     public void LoadScene(int sceneId)
     {
-        //playerController.playerSpawnpoints.Clear(); // Clear the spawnpoints list to avoid duplicates
+        SceneManager.sceneLoaded += OnSceneLoaded;        
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
         SceneManager.LoadScene(sceneId);
 
         if (sceneId == 0) // Loading Main Menu
@@ -24,10 +24,27 @@ public class LevelManager : MonoBehaviour
         }
         else // it should be a Gameplay level
         {
-            // Note: Might need a check here if we ever have a level change while in the State_GameRidecar
-
             gameStateManager.SwitchToState(gameStateManager.gameState_Gameplay);
+        }        
+    }
+
+    IEnumerator LoadSceneAsync(int sceneId)
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        gameStateManager.SwitchToState(gameStateManager.gameState_Loading);
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneId);
+
+        // Update Progress bar during loading operation.
+        while (asyncLoad.isDone == false)
+        {
+            float progressValue = Mathf.Clamp01(asyncLoad.progress / 0.9f);
+
+            uIManager.LoadingUIController.UpdateProgressBar(progressValue);               
+            yield return null;
         }
+
     }
 
 

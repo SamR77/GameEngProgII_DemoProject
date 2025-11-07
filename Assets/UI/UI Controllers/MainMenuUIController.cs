@@ -3,54 +3,72 @@ using UnityEngine.UIElements;
 
 public class MainMenuUIController : MonoBehaviour
 {
-    private UIDocument mainMenuUIDoc => GetComponent<UIDocument>();
+    GameManager gameManager;
+    UIManager uIManager;
+    LevelManager levelManager;
+    InputManager inputManager;
+    GameStateManager gameStateManager;
 
-    GameManager gameManager => GameManager.Instance;
-    UIManager UIManager => GameManager.Instance.UIManager;
-    LevelManager levelManager => GameManager.Instance.LevelManager;
-    InputManager inputManager => GameManager.Instance.InputManager;
-    GameStateManager gameStateManager => GameManager.Instance.GameStateManager;
-
+    UIDocument mainMenuUIDoc;
 
     Button playButton;
     Button optionsButton;
     Button quitButton;
 
-    private Button[] menuButtons;
+    Button[] menuButtons;
 
-
-
-
-    private void OnEnable()
+    private void Awake()
     {
-        // Button References
+        #region Set Manager References
+
+        // Set Managers References ( "??=" if not already set)
+        gameManager ??= GameManager.Instance;
+        uIManager ??= GameManager.Instance.UIManager;
+        levelManager ??= GameManager.Instance.LevelManager;
+        inputManager ??= GameManager.Instance.InputManager;
+        gameStateManager ??= GameManager.Instance.GameStateManager;
+
+        //check manager references for null
+        if (gameManager == null) Debug.LogError("GameManager reference is null!");
+        if (uIManager == null) Debug.LogError("UIManager reference is null!");
+        if (levelManager == null) Debug.LogError("LevelManager reference is null!");
+        if (inputManager == null) Debug.LogError("InputManager reference is null!");
+        if (gameStateManager == null) Debug.LogError("GameStateManager reference is null!");
+
+        #endregion
+    }
+
+    // Start() call is the reccomended init method for setting UItoolkit references
+    private void Start()
+    {
+        #region Set UI References
+
+        // Set UI Document Reference ( "??=" if not already set)
+        mainMenuUIDoc ??= GetComponent<UIDocument>();
+        if(mainMenuUIDoc == null) Debug.LogError("No UIDocument component found on this gameobject!");
+
+        // Set Button References ( "??=" if not already set)
         playButton = mainMenuUIDoc.rootVisualElement.Q<Button>("PlayButton");
         optionsButton = mainMenuUIDoc.rootVisualElement.Q<Button>("OptionsButton");
         quitButton = mainMenuUIDoc.rootVisualElement.Q<Button>("QuitButton");
+
+        // Check to make sure buttons are found
+        if(playButton == null) Debug.LogError("Play Button not found in MainMenu_UIDoc");
+        if(optionsButton == null) Debug.LogError("Options Button not found in MainMenu_UIDoc");
+        if(quitButton == null) Debug.LogError("Quit Button not found in MainMenu_UIDoc");
+
+        #endregion
+
+        #region Subscribe to Button Click Events
 
         playButton.clicked += OnPlayButtonClicked;
         optionsButton.clicked += OnOptionsClicked;
         quitButton.clicked += OnQuitButtonClicked;
 
-
-
-        // Check to make sure buttons are found
-        if (playButton == null) Debug.LogError("Play Button not found in MainMenu_UIDoc");
-        if (optionsButton == null) Debug.LogError("Options Button not found in MainMenu_UIDoc");
-        if (quitButton == null) Debug.LogError("Quit Button not found in MainMenu_UIDoc");
-
-
-
-
+        #endregion
     }
 
-    private void OnDestroy()
-    {
 
-        playButton.clicked -= OnPlayButtonClicked;
-        optionsButton.clicked -= OnOptionsClicked;
-        quitButton.clicked -= OnQuitButtonClicked;
-    }
 
     #region Button Click Handlers
     private void OnQuitButtonClicked()
@@ -70,8 +88,20 @@ public class MainMenuUIController : MonoBehaviour
 
         levelManager.LoadScene(1);
     }
-    
+
     #endregion
+
+
+    private void OnDestroy()
+    {
+        #region UnSubscribe to Button Click Events
+
+        playButton.clicked -= OnPlayButtonClicked;
+        optionsButton.clicked -= OnOptionsClicked;
+        quitButton.clicked -= OnQuitButtonClicked;
+
+        #endregion
+    }
 
 
 }

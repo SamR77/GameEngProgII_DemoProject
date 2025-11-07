@@ -7,17 +7,26 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UIDocument mainMenuUI;
     [SerializeField] private UIDocument gameplayUI;
     [SerializeField] private UIDocument pauseUI;
+    [SerializeField] private UIDocument loadingScreenUI;
+
+    // public accessor for loading screen Controller
+    public LoadingUIController LoadingUIController;
+
 
     private void Awake()
     {
         mainMenuUI = FindUIDocument("MainMenuUI");
         gameplayUI = FindUIDocument("GameplayUI");
         pauseUI = FindUIDocument("PauseUI");
+        loadingScreenUI = FindUIDocument("LoadingScreenUI");
+
+        LoadingUIController = loadingScreenUI.GetComponent<LoadingUIController>();
 
         // Activate Parent GameObject of all UI Screens (Some are disbaled for visibity in the editor Game view)
         if (mainMenuUI != null) mainMenuUI.gameObject.SetActive(true);
         if (gameplayUI != null) gameplayUI.gameObject.SetActive(true);
         if (pauseUI != null) pauseUI.gameObject.SetActive(true);
+        if (loadingScreenUI != null) loadingScreenUI.gameObject.SetActive(true);
 
         HideAllUIMenus();
     }
@@ -44,6 +53,12 @@ public class UIManager : MonoBehaviour
         gameplayUI.rootVisualElement.style.display = DisplayStyle.Flex;
     }
 
+    public void ShowLoadingScreenUI()
+    {
+        HideAllUIMenus();
+        loadingScreenUI.rootVisualElement.style.display = DisplayStyle.Flex;
+    }
+
 
     public void HideAllUIMenus()
     {
@@ -54,6 +69,7 @@ public class UIManager : MonoBehaviour
         mainMenuUI.rootVisualElement.style.display = DisplayStyle.None;
         gameplayUI.rootVisualElement.style.display = DisplayStyle.None;
         pauseUI.rootVisualElement.style.display = DisplayStyle.None;
+        loadingScreenUI.rootVisualElement.style.display = DisplayStyle.None;
     }
 
 
